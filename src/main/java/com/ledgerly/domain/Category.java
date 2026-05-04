@@ -1,10 +1,12 @@
 package com.ledgerly.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "category")
 @Getter
@@ -25,9 +27,4 @@ public class Category {
 
     @Column(nullable = false)
     private String type;
-
-    @Transient
-    public boolean isDefault() {
-        return user == null;
-    }
 }

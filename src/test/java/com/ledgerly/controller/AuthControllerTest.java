@@ -1,5 +1,6 @@
 package com.ledgerly.controller;
 
+import com.ledgerly.repository.CategoryRepository;
 import com.ledgerly.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,8 +27,12 @@ class AuthControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @AfterEach
     void tearDown() {
+        categoryRepository.deleteAll();
         userRepository.deleteAll();
     }
 

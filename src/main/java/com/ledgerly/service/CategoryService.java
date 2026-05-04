@@ -26,12 +26,12 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public List<Category> findAll(User user) {
-        return categoryRepository.findByUserOrUserIsNull(user);
+        return categoryRepository.findByUser(user);
     }
 
     @Transactional(readOnly = true)
     public Category findById(Long id, User user) {
-        return categoryRepository.findByIdAndUserOrDefault(id, user)
+        return categoryRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
     }
 

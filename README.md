@@ -161,3 +161,10 @@ CATEGORY ||--o{ TRANSACTION : "1:N"
 
 - **원인:** `@NotEmpty`는 공백 문자(`" "`)를 길이 1인 유효한 값으로 인식.
 - **해결:** `@NotBlank`로 교체 — trim 후 빈 값인지 검사하여 공백 단독 입력 차단.
+
+---
+
+### 🚨 Issue 4: 예산·대시보드 API에서 Jackson 직렬화 오류 (`ByteBuddyInterceptor`)
+
+- **원인:** `Budget.category`가 `FetchType.LAZY`로 설정되어 있어, 조회 시 Hibernate가 실제 `Category` 대신 `Category$HibernateProxy` 프록시 객체를 반환합니다. Jackson이 이 프록시의 `hibernateLazyInitializer` 필드를 직렬화하려다 실패하여 500 오류 및 클라이언트 401 루프가 발생했습니다.
+- **해결:** `Category` 엔티티에 `@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})` 추가. Jackson이 Hibernate 프록시 관련 내부 필드를 무시하고 실제 데이터만 직렬화합니다.

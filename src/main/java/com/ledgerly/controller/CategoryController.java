@@ -7,6 +7,7 @@ import com.ledgerly.service.CategoryService;
 import com.ledgerly.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -61,7 +62,13 @@ public class CategoryController {
     public ResponseEntity<?> delete(@AuthenticationPrincipal UserDetails userDetails,
                                     @PathVariable Long id) {
         User user = userService.findByEmail(userDetails.getUsername());
-        categoryService.delete(id, user);
-        return ResponseEntity.noContent().build();
+        try {
+            categoryService.delete(id, user);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body("해당 카테고리를 사용하는 거래 내역이 있어 삭제할 수 없습니다.");
+        }
     }
 }

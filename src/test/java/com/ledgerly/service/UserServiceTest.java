@@ -1,6 +1,8 @@
 package com.ledgerly.service;
 
+import com.ledgerly.domain.Category;
 import com.ledgerly.domain.User;
+import com.ledgerly.repository.CategoryRepository;
 import com.ledgerly.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,9 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private CategoryRepository categoryRepository;
+
     @InjectMocks
     private UserService userService;
 
@@ -47,6 +52,7 @@ class UserServiceTest {
         assertThat(result.getPassword()).isEqualTo("encodedPassword");
         assertThat(result.getUsername()).isEqualTo("김인태");
         verify(userRepository, times(1)).save(any(User.class));
+        verify(categoryRepository, times(8)).save(any(Category.class));
 
     }
 
