@@ -1,6 +1,5 @@
 package com.ledgerly.dto;
 
-import com.ledgerly.domain.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,6 +14,6 @@ public class DashboardResponseDto {
     private int totalIncome;
     private int totalExpense;
     private int balance;
-    private List<Transaction> transactions;
+    private List<TransactionResponseDto> transactions;
     private List<BudgetStatusDto> budgetStatuses;
 }

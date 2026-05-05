@@ -1,9 +1,9 @@
 package com.ledgerly.controller;
 
-import com.ledgerly.domain.Transaction;
 import com.ledgerly.domain.User;
 import com.ledgerly.dto.BudgetStatusDto;
 import com.ledgerly.dto.DashboardResponseDto;
+import com.ledgerly.dto.TransactionResponseDto;
 import com.ledgerly.service.BudgetService;
 import com.ledgerly.service.TransactionService;
 import com.ledgerly.service.UserService;
@@ -39,16 +39,16 @@ public class DashboardController {
 
         User user = userService.findByEmail(userDetails.getUsername());
 
-        List<Transaction> transactions = transactionService.findByUserAndMonth(user, year, month);
+        List<TransactionResponseDto> transactions = transactionService.findDtosByUserAndMonth(user, year, month);
 
         int totalIncome = transactions.stream()
                 .filter(t -> "INCOME".equals(t.getType()))
-                .mapToInt(Transaction::getAmount)
+                .mapToInt(TransactionResponseDto::getAmount)
                 .sum();
 
         int totalExpense = transactions.stream()
                 .filter(t -> "EXPENSE".equals(t.getType()))
-                .mapToInt(Transaction::getAmount)
+                .mapToInt(TransactionResponseDto::getAmount)
                 .sum();
 
         List<BudgetStatusDto> budgetStatuses = budgetService.findBudgetStatusByUserAndMonth(user, year, month);

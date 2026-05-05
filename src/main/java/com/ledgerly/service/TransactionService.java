@@ -3,6 +3,7 @@ package com.ledgerly.service;
 import com.ledgerly.domain.Category;
 import com.ledgerly.domain.Transaction;
 import com.ledgerly.domain.User;
+import com.ledgerly.dto.TransactionResponseDto;
 import com.ledgerly.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +51,18 @@ public class TransactionService {
                 .findByUserAndTransactionDateBetweenOrderByTransactionDateDesc(
                         user, startDate, endDate
                 );
+    }
+
+    @Transactional(readOnly = true)
+    public List<TransactionResponseDto> findDtosByUserAndMonth(User user, int year, int month) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+        return transactionRepository
+                .findByUserAndTransactionDateBetweenOrderByTransactionDateDesc(user, startDate, endDate)
+                .stream()
+                .map(TransactionResponseDto::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
