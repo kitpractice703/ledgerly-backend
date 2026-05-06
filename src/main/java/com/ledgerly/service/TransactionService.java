@@ -43,17 +43,6 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
-    public List<Transaction> findByUserAndMonth(User user, int year, int month) {
-        LocalDate startDate = LocalDate.of(year, month, 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
-
-        return transactionRepository
-                .findByUserAndTransactionDateBetweenOrderByTransactionDateDesc(
-                        user, startDate, endDate
-                );
-    }
-
-    @Transactional(readOnly = true)
     public List<TransactionResponseDto> findDtosByUserAndMonth(User user, int year, int month) {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
@@ -70,11 +59,15 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 거래 내역입니다."));
 
-        // 타인의 거래 내역 접근 시도 차단
         if (!transaction.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("접근 권한이 없습니다.");
         }
         return transaction;
+    }
+
+    @Transactional(readOnly = true)
+    public TransactionResponseDto findByIdDto(Long transactionId, User user) {
+        return new TransactionResponseDto(findById(transactionId, user));
     }
 
     @Transactional
@@ -110,7 +103,7 @@ public class TransactionService {
     }
 
     @Transactional(readOnly = true)
-    public List<Transaction> findByUserWithFilters(User user, int year, Integer month, Long categoryId, String type) {
+    public List<TransactionResponseDto> findByUserWithFilters(User user, int year, Integer month, Long categoryId, String type) {
         LocalDate startDate, endDate;
         if (month != null) {
             startDate = LocalDate.of(year, month, 1);
@@ -125,6 +118,7 @@ public class TransactionService {
                 .stream()
                 .filter(t -> categoryId == null || t.getCategory().getId().equals(categoryId))
                 .filter(t -> type == null || type.isBlank() || t.getType().equals(type))
+                .map(TransactionResponseDto::new)
                 .toList();
     }
 

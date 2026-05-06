@@ -3,7 +3,7 @@ package com.ledgerly.controller;
 import com.ledgerly.domain.Transaction;
 import com.ledgerly.domain.User;
 import com.ledgerly.dto.TransactionRequestDto;
-import com.ledgerly.service.CategoryService;
+import com.ledgerly.dto.TransactionResponseDto;
 import com.ledgerly.service.TransactionService;
 import com.ledgerly.service.UserService;
 import jakarta.validation.Valid;
@@ -24,11 +24,10 @@ import java.util.List;
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private final CategoryService categoryService;
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<Transaction>> findAll(
+    public ResponseEntity<List<TransactionResponseDto>> findAll(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Integer month,
@@ -54,15 +53,14 @@ public class TransactionController {
                 dto.getDescription(), dto.getType(), dto.getTransactionDate()
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new TransactionResponseDto(transaction));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<TransactionResponseDto> findById(@AuthenticationPrincipal UserDetails userDetails,
                                       @PathVariable Long id) {
         User user = userService.findByEmail(userDetails.getUsername());
-        Transaction transaction = transactionService.findById(id, user);
-        return ResponseEntity.ok(transaction);
+        return ResponseEntity.ok(transactionService.findByIdDto(id, user));
     }
 
     @PutMapping("/{id}")
