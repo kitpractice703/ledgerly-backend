@@ -18,6 +18,15 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * TransactionController - 거래 내역 CRUD REST 컨트롤러
+ *
+ * <p>[설계] 모든 엔드포인트에서 {@code @AuthenticationPrincipal}로 현재 인증된 사용자를 주입받습니다.
+ * JWT를 통해 인증된 사용자 이메일이 {@link org.springframework.security.core.userdetails.UserDetails#getUsername()}으로 반환됩니다.</p>
+ *
+ * <p>[보안] 소유권 검증(IDOR 방지)은 서비스 레이어({@link TransactionService})에서 수행합니다.
+ * 컨트롤러는 요청 파싱과 응답 포맷에만 집중합니다.</p>
+ */
 @RestController
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
@@ -26,6 +35,10 @@ public class TransactionController {
     private final TransactionService transactionService;
     private final UserService userService;
 
+    /**
+     * 연도·월·카테고리·타입 필터로 거래 내역 목록을 조회합니다.
+     * year 파라미터가 없으면 현재 연도를 기본값으로 사용합니다.
+     */
     @GetMapping
     public ResponseEntity<List<TransactionResponseDto>> findAll(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -38,6 +51,7 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.findByUserWithFilters(user, y, month, categoryId, type));
     }
 
+    /** 새로운 거래 내역을 등록합니다. 성공 시 201 Created와 생성된 리소스를 반환합니다. */
     @PostMapping
     public ResponseEntity<?> save(@AuthenticationPrincipal UserDetails userDetails,
                                   @Valid @RequestBody TransactionRequestDto dto,
@@ -56,6 +70,7 @@ public class TransactionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new TransactionResponseDto(transaction));
     }
 
+    /** 거래 내역 단건을 조회합니다. 소유권 검증은 서비스 레이어에서 처리합니다. */
     @GetMapping("/{id}")
     public ResponseEntity<TransactionResponseDto> findById(@AuthenticationPrincipal UserDetails userDetails,
                                       @PathVariable Long id) {
@@ -63,6 +78,7 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.findByIdDto(id, user));
     }
 
+    /** 거래 내역을 수정합니다. 소유권 불일치 시 서비스에서 예외를 발생시킵니다. */
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@AuthenticationPrincipal UserDetails userDetails,
                                     @PathVariable Long id,
@@ -80,6 +96,7 @@ public class TransactionController {
         return ResponseEntity.ok().build();
     }
 
+    /** 거래 내역을 삭제합니다. 성공 시 204 No Content를 반환합니다. */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@AuthenticationPrincipal UserDetails userDetails,
                                     @PathVariable Long id) {
