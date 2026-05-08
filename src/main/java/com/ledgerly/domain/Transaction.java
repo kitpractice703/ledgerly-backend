@@ -1,6 +1,5 @@
 package com.ledgerly.domain;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -11,16 +10,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Transaction - 개별 수입·지출 거래 내역 엔티티
+ * 거래 내역 엔티티입니다.
+ * transactionDate는 사용자가 입력하는 거래 발생일이고,
+ * createdAt은 레코드가 DB에 저장된 시각으로 서로 다른 개념입니다.
  *
- * <p>[설계] 거래 날짜를 {@link LocalDate}로, 생성 시각을 {@link LocalDateTime}으로 구분합니다.
- * 사용자가 입력하는 "거래 발생일"과 "레코드 생성 시각"은 별개의 개념입니다.</p>
- *
- * <p>[보안] {@code user} 연관관계에 {@code @JsonIgnore}를 적용하여 거래 응답에 다른
- * 사용자 정보가 포함되지 않도록 합니다. 카테고리는 응답에 포함되지만 소유자 정보는 제외됩니다.</p>
- *
- * <p>[설계] {@code user}와 {@code category} 모두 {@code FetchType.LAZY}로 설정하여
- * 기본 조회 시 불필요한 JOIN을 방지합니다. 필요할 때만 연관 엔티티를 로드합니다.</p>
+ * @JsonIgnoreProperties는 Lazy 프록시의 hibernateLazyInitializer 필드가
+ * JSON 직렬화될 때 오류가 나는 것을 방지합니다.
  */
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
@@ -33,13 +28,11 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // [보안] 거래 소유자입니다. API 응답에 사용자 정보가 노출되지 않도록 @JsonIgnore 적용
-    @JsonIgnore
+    @JsonIgnore // 응답에 다른 사용자 정보가 섞이지 않도록 제외합니다.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // 카테고리는 응답 DTO에 포함되지만, 소유자(user) 필드는 @JsonIgnoreProperties로 제외됩니다.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
@@ -47,18 +40,14 @@ public class Transaction {
     @Column(nullable = false)
     private Integer amount;
 
-    // 메모는 선택 입력 항목으로 nullable입니다.
-    private String description;
+    private String description; // 선택 입력이므로 nullable
 
-    // "INCOME"(수입) 또는 "EXPENSE"(지출)
     @Column(nullable = false)
-    private String type;
+    private String type; // "INCOME" 또는 "EXPENSE"
 
-    // 사용자가 직접 입력하는 거래 발생일 (레코드 생성 시각인 createdAt과 구별)
     @Column(nullable = false)
     private LocalDate transactionDate;
 
-    // [설계] updatable = false로 레코드 생성 후 변경 불가한 감사 필드로 관리합니다.
     @Column(updatable = false)
     private LocalDateTime createdAt;
 

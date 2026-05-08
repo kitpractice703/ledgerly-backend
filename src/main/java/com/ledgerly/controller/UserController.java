@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 /**
  * UserController - 로그인한 사용자의 프로필 조회·수정 및 비밀번호 변경 컨트롤러
  *
- * <p>[설계] "/me" 경로 규칙을 사용하여 항상 현재 인증된 사용자 자신의 리소스만 접근합니다.
- * 타인의 userId를 경로 변수로 받는 방식을 사용하지 않아 IDOR 취약점의 여지를 없앱니다.</p>
+ * "/me" 경로 규칙을 사용하여 항상 현재 인증된 사용자 자신의 리소스만 접근합니다.
+ * 타인의 userId를 경로 변수로 받는 방식을 사용하지 않아 IDOR 취약점의 여지를 없앱니다.
  */
 @RestController
 @RequestMapping("/api/users")
@@ -50,8 +50,8 @@ public class UserController {
     /**
      * 비밀번호를 변경합니다.
      *
-     * <p>[보안] 현재 비밀번호를 입력받아 서비스 레이어에서 BCrypt 비교로 검증합니다.
-     * 현재 비밀번호가 틀리면 400 Bad Request를 반환합니다.</p>
+     * 현재 비밀번호를 입력받아 서비스 레이어에서 BCrypt 비교로 검증합니다.
+     * 현재 비밀번호가 틀리면 400 Bad Request를 반환합니다.
      */
     @PutMapping("/me/password")
     public ResponseEntity<?> changePassword(

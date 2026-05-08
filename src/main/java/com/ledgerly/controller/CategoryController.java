@@ -20,8 +20,8 @@ import java.util.List;
 /**
  * CategoryController - 카테고리 CRUD REST 컨트롤러
  *
- * <p>[보안] 모든 카테고리 조회·수정·삭제는 인증된 사용자의 소유 카테고리만 대상으로 합니다.
- * {@link CategoryService}의 {@code findByIdAndUser}가 소유권 검증을 담당합니다.</p>
+ * 모든 카테고리 조회·수정·삭제는 인증된 사용자의 소유 카테고리만 대상으로 합니다.
+ * {@link CategoryService}의 {@code findByIdAndUser}가 소유권 검증을 담당합니다.
  */
 @RestController
 @RequestMapping("/api/categories")
@@ -70,9 +70,9 @@ public class CategoryController {
     /**
      * 카테고리를 삭제합니다.
      *
-     * <p>[설계] {@link DataIntegrityViolationException}을 별도로 캐치합니다.
+     * {@link DataIntegrityViolationException}을 별도로 캐치합니다.
      * 해당 카테고리를 참조하는 거래 내역이 존재하면 DB 외래키 제약으로 삭제가 거부되며,
-     * 이를 사용자 친화적인 메시지로 변환하여 반환합니다.</p>
+     * 이를 사용자 친화적인 메시지로 변환하여 반환합니다.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@AuthenticationPrincipal UserDetails userDetails,

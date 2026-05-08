@@ -21,11 +21,11 @@ import java.util.List;
 /**
  * TransactionController - 거래 내역 CRUD REST 컨트롤러
  *
- * <p>[설계] 모든 엔드포인트에서 {@code @AuthenticationPrincipal}로 현재 인증된 사용자를 주입받습니다.
- * JWT를 통해 인증된 사용자 이메일이 {@link org.springframework.security.core.userdetails.UserDetails#getUsername()}으로 반환됩니다.</p>
+ * 모든 엔드포인트에서 {@code @AuthenticationPrincipal}로 현재 인증된 사용자를 주입받습니다.
+ * JWT를 통해 인증된 사용자 이메일이 {@link org.springframework.security.core.userdetails.UserDetails#getUsername()}으로 반환됩니다.
  *
- * <p>[보안] 소유권 검증(IDOR 방지)은 서비스 레이어({@link TransactionService})에서 수행합니다.
- * 컨트롤러는 요청 파싱과 응답 포맷에만 집중합니다.</p>
+ * 소유권 검증(IDOR 방지)은 서비스 레이어({@link TransactionService})에서 수행합니다.
+ * 컨트롤러는 요청 파싱과 응답 포맷에만 집중합니다.
  */
 @RestController
 @RequestMapping("/api/transactions")

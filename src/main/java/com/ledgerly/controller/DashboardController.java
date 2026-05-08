@@ -20,13 +20,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * DashboardController - 월별 재정 현황 요약 데이터를 제공하는 컨트롤러
- *
- * <p>[설계] 대시보드에 필요한 데이터를 단일 API 호출로 제공하여 프론트엔드의 요청 수를 줄입니다.
- * 거래 내역, 수입·지출 합계, 예산 현황을 {@link DashboardResponseDto} 하나로 묶어 반환합니다.</p>
- *
- * <p>[설계] 수입·지출 합계를 DB 집계 쿼리 대신 이미 조회한 거래 목록을 Java 스트림으로 계산합니다.
- * 거래 목록을 다시 사용할 수 있어 DB 쿼리 수를 줄이고, 데이터 일관성을 보장합니다.</p>
+ * 대시보드에 필요한 거래 내역·합계·예산 현황을 단일 API 호출로 반환하는 컨트롤러입니다.
+ * 수입·지출 합계는 거래 목록을 한 번만 조회한 뒤 스트림으로 계산하여 추가 DB 쿼리를 줄였습니다.
  */
 @RestController
 @RequestMapping("/api/dashboard")
@@ -37,10 +32,8 @@ public class DashboardController {
     private final UserService userService;
     private final BudgetService budgetService;
 
-    /**
-     * 특정 연월의 대시보드 데이터(거래 내역·합계·예산 현황)를 반환합니다.
-     * year/month 파라미터가 0이면 현재 연월을 기본값으로 사용합니다.
-     */
+    // year/month 기본값을 0으로 받아, 0이면 현재 연월로 대체합니다.
+    // defaultValue에 현재 날짜를 직접 지정하면 서버 시작 시점에 고정되어 이 방식을 사용했습니다.
     @GetMapping
     public ResponseEntity<DashboardResponseDto> dashboard(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -52,10 +45,8 @@ public class DashboardController {
 
         User user = userService.findByEmail(userDetails.getUsername());
 
-        // 거래 목록을 한 번 조회하여 합계 계산과 응답 구성에 모두 재사용합니다.
         List<TransactionResponseDto> transactions = transactionService.findDtosByUserAndMonth(user, year, month);
 
-        // [설계] 이미 로드된 거래 목록을 스트림으로 합산하여 추가 DB 쿼리를 생략합니다.
         int totalIncome = transactions.stream()
                 .filter(t -> "INCOME".equals(t.getType()))
                 .mapToInt(TransactionResponseDto::getAmount)

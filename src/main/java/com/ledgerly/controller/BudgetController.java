@@ -20,11 +20,11 @@ import java.util.List;
 /**
  * BudgetController - 월별 예산 CRUD REST 컨트롤러
  *
- * <p>[설계] 예산 조회는 실제 지출액과 초과 여부를 포함한 {@link BudgetStatusDto}로 반환합니다.
- * 단순 엔티티가 아닌 비즈니스 가공 데이터를 응답하여 프론트엔드의 추가 계산을 줄입니다.</p>
+ * 예산 조회는 실제 지출액과 초과 여부를 포함한 {@link BudgetStatusDto}로 반환합니다.
+ * 단순 엔티티가 아닌 비즈니스 가공 데이터를 응답하여 프론트엔드의 추가 계산을 줄입니다.
  *
- * <p>[설계] year/month 기본값을 0으로 받아 0이면 현재 날짜로 대체합니다.
- * defaultValue를 현재 날짜 문자열로 지정하면 서버 시작 시점이 고정되므로 이 방식을 사용합니다.</p>
+ * year/month 기본값을 0으로 받아 0이면 현재 날짜로 대체합니다.
+ * defaultValue를 현재 날짜 문자열로 지정하면 서버 시작 시점이 고정되므로 이 방식을 사용합니다.
  */
 @RestController
 @RequestMapping("/api/budgets")
