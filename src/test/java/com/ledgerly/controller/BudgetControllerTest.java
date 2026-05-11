@@ -56,38 +56,50 @@ class BudgetControllerTest {
     @Test
     @DisplayName("비인증 요청 시 401 반환")
     void getBudgets_unauthenticated_returns401() throws Exception {
+        // given — @BeforeEach로 사용자·카테고리 존재, 인증 없음
+
+        // when
         mockMvc.perform(get("/api/budgets"))
+                // then
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("인증 사용자 예산 조회 성공")
     void getBudgets_authenticated_returns200() throws Exception {
+        // given — @BeforeEach로 사용자·카테고리 존재
+
+        // when
         mockMvc.perform(get("/api/budgets")
                         .with(user("test@test.com").roles("USER")))
+                // then
                 .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("예산 등록 성공 시 201 반환")
     void saveBudget_success_returns201() throws Exception {
+        // given — @BeforeEach로 사용자·카테고리 존재
         String body = String.format(
                 "{\"categoryId\":%d,\"limitAmount\":300000,\"year\":2026,\"month\":4}",
                 testCategory.getId()
         );
 
+        // when
         mockMvc.perform(post("/api/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user("test@test.com").roles("USER"))
                         .content(body))
                 .andExpect(status().isCreated());
 
+        // then
         assertThat(budgetRepository.count()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("같은 카테고리 예산 중복 등록 시 400 반환")
     void saveBudget_duplicate_returns400() throws Exception {
+        // given — @BeforeEach + 동일 조건 예산 1회 등록 성공
         String body = String.format(
                 "{\"categoryId\":%d,\"limitAmount\":300000,\"year\":2026,\"month\":4}",
                 testCategory.getId()
@@ -98,12 +110,14 @@ class BudgetControllerTest {
                 .with(user("test@test.com").roles("USER"))
                 .content(body));
 
+        // when — 동일 카테고리·연월 재등록
         mockMvc.perform(post("/api/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user("test@test.com").roles("USER"))
                         .content(body))
                 .andExpect(status().isBadRequest());
 
+        // then
         assertThat(budgetRepository.count()).isEqualTo(1);
     }
 }
